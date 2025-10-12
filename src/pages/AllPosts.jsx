@@ -1,8 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import CustomCardUi from "@/components/CustomCardUi";
-import { Input } from "@/components/ui/input";
 import { IoSearchSharp } from "react-icons/io5";
 import { fetchCategories, fetchPostPreview, fetchPostsByFilter } from "@/services/Posts";
 import { showErrorToast } from "@/components/Toast";
@@ -10,7 +6,8 @@ import Spinner from "@/components/Spinner";
 import HomeHeader from "./Home";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { FaDownload } from "react-icons/fa";
-
+import "./home.css"
+import CustomCardUi from "@/components/CustomCardUi";
 const AllPosts = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -86,78 +83,78 @@ console.log("postsas",posts)
   const totalPages = Math.ceil(totalPosts / pageSize);
 
   return (
-    <div className="p-4">
+    <div className="posts-container">
       <HomeHeader />
-      <h3 className="text-xl font-medium mb-6">All Posts ({totalPosts})</h3>
+      <h3 className="posts-heading">All Posts ({totalPosts})</h3>
 
       {/* Filter Header */}
-      <div className="flex flex-wrap items-center gap-4 mb-6">
-        <div className="w-72 border-1 flex items-center rounded-sm border-gray-500">
-          <Input
-            className="border-none hover:border-none"
+      <div className="filter-header">
+        <div className="search-box">
+          <input
+            className="search-input"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
             placeholder="Search by title or tags"
           />
-          <IoSearchSharp className="w-8 h-4" />
+          <IoSearchSharp className="search-icon" />
         </div>
 
-        <div className="w-60">
-          <Select
-            onValueChange={(value) => setSelectedCategory(categories.find((c) => c.id.toString() === value) || null)}
-            value={selectedCategory ? selectedCategory.id.toString() : undefined}
-          >
-            <SelectTrigger className="border border-gray-500">
-              <SelectValue placeholder="Select Category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((cat) => (
-                <SelectItem key={cat.id} value={cat.id.toString()}>
-                  {cat.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+<div className="category-select">
+  <select
+    value={selectedCategory ? selectedCategory.id.toString() : ""}
+    onChange={(e) =>
+      setSelectedCategory(
+        categories.find((c) => c.id.toString() === e.target.value) || null
+      )
+    }
+  >
+    <option value="">Select Category</option>
+    {categories.map((cat) => (
+      <option key={cat.id} value={cat.id.toString()}>
+        {cat.name}
+      </option>
+    ))}
+  </select>
+</div>
 
-        <Button className="w-40 py-5" onClick={handleApply}>
+
+        <button className="apply-btn" onClick={handleApply}>
           Apply
-        </Button>
+        </button>
       </div>
 
       {/* Posts */}
       {loading ? (
-        <Spinner size={8} />
+        <Spinner size={40} />
       ) : (
         <CustomCardUi posts={posts} onDelete={handleDelete} />
       )}
 
       {/* Pagination */}
-     {!(searchText || selectedCategory) && totalPages > 1 && (
-  <div className="flex justify-center items-center mt-8 gap-4">
-    <Button
-      disabled={page <= 1}
-      onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-      className="flex items-center gap-2 px-5 py-2 bg-[#ff6f3c] text-white font-medium rounded-lg shadow hover:bg-[#e65a1f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-    >
-      <IoChevronBack size={18} /> Previous
-    </Button>
+      {!(searchText || selectedCategory) && totalPages > 1 && (
+        <div className="pagination">
+          <button
+            disabled={page <= 1}
+            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+            className="pagination-btn"
+          >
+            <IoChevronBack size={18} /> Previous
+          </button>
 
-    <span className="text-gray-700 font-medium">
-      Page <span className="font-semibold">{page}</span> of{" "}
-      <span className="font-semibold">{totalPages}</span>
-    </span>
+          <span className="pagination-info">
+            Page <span className="page-number">{page}</span> of{" "}
+            <span className="page-number">{totalPages}</span>
+          </span>
 
-    <Button
-      disabled={page >= totalPages}
-      onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-      className="flex items-center gap-2 px-5 py-2 bg-[#ff6f3c] text-white font-medium rounded-lg shadow hover:bg-[#e65a1f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-    >
-      Next <IoChevronForward size={18} />
-    </Button>
-  </div>
-)}
-
+          <button
+            disabled={page >= totalPages}
+            onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+            className="pagination-btn"
+          >
+            Next <IoChevronForward size={18} />
+          </button>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { showErrorToast, showSuccessToast } from "@/components/Toast";
 import Spinner from "@/components/Spinner";
 import { getVideoPresignedUrl } from "@/services/Posts";
-
+import "./style.css"
 const PresignedVideoUploader = ({ videoUrl, onUploadComplete, onUploadStart, onUploadError }) => {
   const [videoFile, setVideoFile] = useState(null);
   const [uploadedUrl, setUploadedUrl] = useState(videoUrl || "");
@@ -60,26 +59,23 @@ const PresignedVideoUploader = ({ videoUrl, onUploadComplete, onUploadStart, onU
 
 
   return (
-    <div className="relative border border-gray-200 rounded-xl shadow-md bg-gradient-to-b from-white to-gray-50 p-6 mt-8 transition-all hover:shadow-xl">
+  <div className="video-upload-container">
       {loading && (
-        <div className="absolute inset-0 bg-[#1A2C40] bg-opacity-50 z-50 flex flex-col items-center justify-center rounded-xl">
-          <Spinner size={12} />
-          <p className="text-white text-lg mt-2 font-medium">Video is uploading...</p>
+        <div className="upload-overlay">
+          <Spinner size={32} />
+          <p className="upload-text">Video is uploading...</p>
         </div>
       )}
 
-      <h4 className="font-bold text-xl mb-4 flex items-center gap-2">
-        🎥 Upload Video
-      </h4>
+      <h4 className="upload-heading">🎥 Upload Video</h4>
 
       {(!videoFile && !uploadedUrl) || uploadedUrl ? (
-        <div className="flex items-center gap-4">
-          <label className="cursor-pointer flex items-center justify-center px-6 py-3 rounded-lg border border-indigo-400 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 font-medium text-sm transition-all shadow-sm">
+        <div className="upload-buttons">
+          <label className="choose-video-btn">
             Choose Video
             <input
               type="file"
               accept="video/*"
-              className="hidden"
               disabled={loading}
               onChange={(e) => setVideoFile(e.target.files[0])}
             />
@@ -87,7 +83,7 @@ const PresignedVideoUploader = ({ videoUrl, onUploadComplete, onUploadStart, onU
 
           {uploadedUrl && (
             <button
-              className="px-4 py-2 bg-[#ff6f3c] hover:bg-[#ff6f4c] text-white rounded-lg font-medium"
+              className="remove-video-btn"
               onClick={() => {
                 onUploadComplete(null);
                 setVideoFile(null);
@@ -102,22 +98,22 @@ const PresignedVideoUploader = ({ videoUrl, onUploadComplete, onUploadStart, onU
       ) : null}
 
       {videoFile && !uploadedUrl && (
-        <div className="mt-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-700 font-medium">Selected: {videoFile.name}</p>
-            <Button
-              className="bg-[#1A2C40] hover:bg-[#1A2C48] text-white px-4 py-2 rounded-lg flex items-center gap-2"
+        <div className="selected-file-section">
+          <div className="selected-file-header">
+            <p className="selected-file-name">Selected: {videoFile.name}</p>
+            <button
+              className="upload-btn"
               onClick={handlePresignedUpload}
               disabled={loading}
             >
               {loading ? <Spinner size={6} /> : "Upload"}
-            </Button>
+            </button>
           </div>
         </div>
       )}
 
       {uploadedUrl && (
-        <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded-lg shadow-sm transition-all hover:shadow-md">
+        <div className="video-preview">
           <video
             src={
               uploadedUrl.includes("http")
@@ -125,10 +121,8 @@ const PresignedVideoUploader = ({ videoUrl, onUploadComplete, onUploadStart, onU
                 : `https://trade-pilot-bucket.s3.eu-north-1.amazonaws.com/${encodeURI(uploadedUrl)}`
             }
             controls
-            className="w-full rounded-lg shadow-lg"
           />
-
-          <p className="text-xs text-gray-500 break-all mt-2">
+          <p className="video-url">
             <strong>URL:</strong> {uploadedUrl}
           </p>
         </div>

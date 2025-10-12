@@ -1,8 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Input } from "@/components/ui/input";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { Button } from "@/components/ui/button";
 import { IoIosAdd } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
 import { fetchCategories, createPost, getPostById, updatePostById } from "@/services/Posts";
@@ -168,26 +166,27 @@ const CreatePosts = () => {
 
 
 
-  return (
-
-    <div className="p-4">
+  return  (
+    <div className="add-post-container">
       <HomeHeader />
-      <h3 className="text-xl font-medium mb-6">Add Post</h3>
-      {loading ? <Spinner size={8} /> :
+      <h3 className="add-post-heading">Add Post</h3>
 
-        <div className="grid grid-cols-1 lg:grid-cols-10 gap-6" key={formKey}>
-          {/* Left side */}
-          <div className="lg:col-span-7 space-y-4">
+      {loading ? (
+        <Spinner size={40} />
+      ) : (
+        <div className="add-post-grid" key={formKey}>
+          {/* Left Section */}
+          <div className="add-post-left">
             {/* Title */}
-            <Input
+            <input
               placeholder="Add title"
               value={post?.title}
               onChange={(e) => setPost({ ...post, title: e.target.value })}
-              className="w-full h-12"
+              className="post-title-input"
             />
 
             {/* Rich Text Editor */}
-            <div className="border bg-white rounded-md min-h-[16rem]">
+            <div className="editor-container">
               <ReactQuill
                 key={resetKey}
                 theme="snow"
@@ -212,31 +211,33 @@ const CreatePosts = () => {
             </div>
 
             {/* Featured Image */}
-            <div className="border bg-white rounded-md p-4 relative w-full min-h-[48px] flex items-center justify-start">
+            <div className="featured-image-container">
               {post?.featuredImageFile || post?.featuredImageUrl ? (
                 <img
-                  src={post.featuredImageFile ? URL.createObjectURL(post.featuredImageFile) : post.featuredImageUrl}
+                  src={
+                    post.featuredImageFile
+                      ? URL.createObjectURL(post.featuredImageFile)
+                      : post.featuredImageUrl
+                  }
                   alt="Featured"
-                  className="mt-2 w-full max-h-48 object-cover rounded-md"
+                  className="featured-image"
                 />
               ) : (
-                <label
-                  htmlFor="featured-upload"
-                  className="cursor-pointer flex items-center justify-center px-4 py-2 rounded-lg border border-indigo-400 text-indigo-600 bg-white hover:bg-indigo-50 transition-all text-sm font-medium shadow-sm"
-                >
+                <label htmlFor="featured-upload" className="featured-upload-label">
                   Set Featured Image
                   <input
                     id="featured-upload"
                     type="file"
                     accept="image/*"
-                    className="hidden"
+                    className="file-input-hidden"
                     onChange={(e) => {
                       const file = e.target.files[0];
-                      file && setPost((prev) => ({
-                        ...prev,
-                        featuredImageFile: file,
-                        featuredImageUrl: "",
-                      }));
+                      file &&
+                        setPost((prev) => ({
+                          ...prev,
+                          featuredImageFile: file,
+                          featuredImageUrl: "",
+                        }));
                     }}
                   />
                 </label>
@@ -245,8 +246,14 @@ const CreatePosts = () => {
               {(post.featuredImageFile || post.featuredImageUrl) && (
                 <button
                   type="button"
-                  onClick={() => setPost(prev => ({ ...prev, featuredImageFile: null, featuredImageUrl: "" }))}
-                  className="absolute w-[36px] h-[36px] top-2 right-2 bg-[#1A2C40] bg-opacity-50 text-white rounded-full"
+                  onClick={() =>
+                    setPost((prev) => ({
+                      ...prev,
+                      featuredImageFile: null,
+                      featuredImageUrl: "",
+                    }))
+                  }
+                  className="remove-image-btn"
                 >
                   ✕
                 </button>
@@ -254,12 +261,11 @@ const CreatePosts = () => {
             </div>
 
             {/* Featured Video */}
-
             <PresignedVideoUploader
               videoUrl={post.featured_video}
               onUploadStart={() => setVideoUploading(true)}
               onUploadComplete={(url) => {
-                setPost(prev => ({
+                setPost((prev) => ({
                   ...prev,
                   featured_video: url ? url.split(".com/")[1] : "",
                 }));
@@ -267,62 +273,65 @@ const CreatePosts = () => {
               }}
               onUploadError={() => setVideoUploading(false)}
             />
-
-
-
           </div>
 
-          {/* Right side */}
-          <div className="lg:col-span-3 space-y-4">
-            <div className="border bg-white rounded-md p-4">
-              <h4 className="font-medium mb-2 py-5">Publish</h4>
+          {/* Right Section */}
+          <div className="add-post-right">
+            {/* Publish */}
+            <div className="publish-section">
+              <h4 className="publish-title">Publish</h4>
               <button
-                className={`w-full bg-[#ff6f3c] text-white py-2 rounded-lg hover:bg-[#e85d2e] ${loading || videoUploading ? "opacity-50 cursor-not-allowed" : ""}`}
+                className={`publish-btn ${
+                  loading || videoUploading ? "disabled" : ""
+                }`}
                 onClick={handlePublish}
                 disabled={loading || videoUploading}
               >
-                {loading ? <Spinner size={8} /> : id ? "Update Post" : "Publish"}
+                {loading ? <Spinner size={40} /> : id ? "Update Post" : "Publish"}
               </button>
-
-
-
             </div>
 
             {/* Tags */}
-            <div className="border rounded-md p-4 bg-white">
-              <h4 className="font-medium mb-2">Tags</h4>
-              <div className="flex items-center mb-4 bg-white">
-                <Input
-                  className="mr-2"
+            <div className="tags-section">
+              <h4 className="section-title">Tags</h4>
+              <div className="tags-input-row">
+                <input
+                  className="tag-input"
                   value={tagInput}
                   placeholder="Enter tag"
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleAddTag()}
                 />
-                <Button className="flex items-center gap-2 py-5 bg-[#ff6f3c] hover:bg-orange-600 cursor-pointer" onClick={handleAddTag}>
-                  <IoIosAdd style={{ color: "white", fontSize: "20px" }} /> Add
-                </Button>
+                <button
+                  className="add-tag-btn"
+                  onClick={handleAddTag}
+                >
+                  <IoIosAdd className="add-icon" /> Add
+                </button>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="tags-list">
                 {post.tags.map((tag, index) => (
-                  <div key={index} className="flex items-center justify-center bg-gray-200 text-gray-800 px-2 py-1 rounded-full">
-                    <span className="mr-1 text-sm">{tag}</span>
-                    <IoClose className="cursor-pointer text-sm" onClick={() => handleRemoveTag(tag)} />
+                  <div key={index} className="tag-item">
+                    <span className="tag-text">{tag}</span>
+                    <IoClose
+                      className="remove-tag-icon"
+                      onClick={() => handleRemoveTag(tag)}
+                    />
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Categories */}
-            <div className="border rounded-md p-4 bg-white">
-              <h4 className="font-medium mb-2">Categories</h4>
-              <div className="space-y-1">
-                {allCategories && allCategories?.map((category) => (
-                  <label key={category?.id} className="flex items-center justify-between">
-                    <div className="flex items-center">
+            <div className="categories-section">
+              <h4 className="section-title">Categories</h4>
+              <div className="category-list">
+                {allCategories?.map((category) => (
+                  <label key={category?.id} className="category-item">
+                    <div className="category-checkbox">
                       <input
                         type="checkbox"
-                        className="mr-2"
+                        className="checkbox"
                         checked={post?.categories.includes(category?.id)}
                         onChange={() => handleToggleCategory(category?.id)}
                       />
@@ -334,9 +343,8 @@ const CreatePosts = () => {
             </div>
           </div>
         </div>
-      }
+      )}
     </div>
-
   );
 };
 
