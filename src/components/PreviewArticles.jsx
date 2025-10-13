@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import Spinner from "@/components/Spinner";
 import { useFullPost } from "@/services/useFullPost";
-
+import './style.css'
 const PreviewArticles = ({ isOpen, onClose, post }) => {
   const { fullPost, loading } = useFullPost(post?.id, isOpen);
 
