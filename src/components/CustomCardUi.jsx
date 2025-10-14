@@ -13,12 +13,24 @@ import "./style.css";
 const CustomCardUi = ({ posts = [], onDelete }) => {
   const navigate = useNavigate();
   const [selectedPost, setSelectedPost] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openPreview = (post) => {
     setSelectedPost(post);
     setIsModalOpen(true);
   };
+// const handleDownloadVideo = (videoUrl, title) => {
+//   const a = document.createElement("a");
+//   a.href = videoUrl;
+  
+//   a.download = title ? `${title.replace(/\s+/g, "_")}.mp4` : "video.mp4";
+//   a.target = "_blank"; // optional, opens in new tab if needed
+//   document.body.appendChild(a);
+//   a.click();
+//   document.body.removeChild(a);
+
+//   showSuccessToast("Video download started!");
+// };
+
 
   const handleDownloadVideo = async (videoUrl, title) => {
     try {
@@ -126,7 +138,7 @@ const CustomCardUi = ({ posts = [], onDelete }) => {
 
       {/* Actions */}
       <div className="card-actions">
-        <button onClick={() => openPreview(post)} className="icon-btn" title="Preview Post">
+        <button onClick={() => navigate(`/posts/${post?.id}`)} className="icon-btn" title="Preview Post">
           <IoIosEye size={22} />
         </button>
 
@@ -165,11 +177,7 @@ const CustomCardUi = ({ posts = [], onDelete }) => {
           <FiTrash2 size={20} />
         </button>
       </div>
-        <PreviewArticles
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        post={selectedPost}
-      />
+     
     </div>
         );
       })}

@@ -1,50 +1,69 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Spinner from "@/components/Spinner";
 import { useFullPost } from "@/services/useFullPost";
-import './style.css'
-const PreviewArticles = ({ isOpen, onClose, post }) => {
-  const { fullPost, loading } = useFullPost(post?.id, isOpen);
+import './article.css';
+import { useParams, Link } from "react-router-dom";
+import HomeHeader from "@/pages/Home";
+import { fetchPostPreview } from "@/services/Posts";
+import { FaRegFileAlt } from "react-icons/fa";
 
-  // Disable background scroll
+const PreviewArticles = () => {
+  const { id } = useParams(); 
+  const { fullPost, loading } = useFullPost(id);
+  const [otherPosts, setOtherPosts] = useState([]);
+  const [loadingOther, setLoadingOther] = useState(true);
+
+  // Fetch other articles
   useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "auto";
-    return () => { document.body.style.overflow = "auto"; };
-  }, [isOpen]);
+    const loadOtherPosts = async () => {
+      try {
+        const posts = await fetchPostPreview();
+        setOtherPosts(posts?.results ? posts.results.filter(p => p.id !== parseInt(id)) : []);
+      } catch (error) {
+        console.error("Failed to fetch other posts", error);
+      } finally {
+        setLoadingOther(false);
+      }
+    };
+    loadOtherPosts();
+  }, [id]);
 
-  if (!isOpen) return null;
+  if (loading) {
+    return (
+      <div className="preview-spinner-wrapper">
+        <Spinner size={50} />
+      </div>
+    );
+  }
+
+  if (!fullPost) {
+    return <div className="preview-error">Failed to load post.</div>;
+  }
 
   return (
-   <div className="modal-overlay">
-  <div className="modal-container">
-    <button onClick={onClose} className="modal-close">&times;</button>
-
-    <div className="modal-content">
-      {loading ? (
-        <div className="spinner-wrapper">
-          <Spinner size={40} />
-        </div>
-      ) : fullPost ? (
-        <>
-          <h1 className="modal-title">{fullPost.title}</h1>
+    <>
+      <HomeHeader />
+      <div className="preview-page-container">
+        {/* Left Panel */}
+        <div className="preview-left-panel">
+          <h1 className="preview-post-title">{fullPost.title}</h1>
 
           {/* Categories */}
           {fullPost.categories?.length > 0 && (
-            <div className="modal-categories">
+            <div className="preview-post-categories">
               {fullPost.categories.map((cat) => (
-                <span key={cat.id} className="modal-category">
-                  {cat.name}
-                </span>
+                <span key={cat.id} className="preview-post-category">{cat.name}</span>
               ))}
             </div>
           )}
 
           {/* Tags */}
           {fullPost.tags?.length > 0 && (
-            <div className="modal-tags">
+            <div className="preview-post-tags">
               {fullPost.tags.map((tag, idx) => (
                 <span
                   key={idx}
-                  className={`modal-tag ${idx % 2 === 0 ? "tag-blue" : "tag-green"}`}
+                  className={`preview-post-tag ${idx % 2 === 0 ? "preview-tag-blue" : "preview-tag-green"}`}
                 >
                   {tag}
                 </span>
@@ -52,44 +71,57 @@ const PreviewArticles = ({ isOpen, onClose, post }) => {
             </div>
           )}
 
-          {/* Media Section */}
+          {/* Media */}
           {(fullPost.featured_video || fullPost.featured_image) && (
-            <div className="modal-media">
+            <div className="preview-post-media">
               {fullPost.featured_video && (
-                <div className={`media-item ${fullPost.featured_image ? "half-width" : ""}`}>
-                  <video
-                    src={fullPost.featured_video}
-                    controls
-                    className="media-video"
-                  />
-                </div>
+                <video src={fullPost.featured_video} controls className="preview-media-video" />
               )}
-
               {fullPost.featured_image && (
-                <div className={`media-item ${fullPost.featured_video ? "half-width" : ""}`}>
-                  <img
-                    src={fullPost.featured_image}
-                    alt={fullPost.title || "Featured Image"}
-                    className="media-image"
-                  />
-                </div>
+                <img src={fullPost.featured_image} alt={fullPost.title} className="preview-media-image" />
               )}
             </div>
           )}
 
-          {/* Body */}
+          {/* Post Body */}
           <div
-            className="modal-body"
+            className="preview-post-body"
             dangerouslySetInnerHTML={{ __html: fullPost.body }}
           />
-        </>
-      ) : (
-        <div className="modal-error">Failed to load post.</div>
-      )}
-    </div>
-  </div>
-</div>
+        </div>
 
+        {/* Right Panel */}
+        <div className="preview-right-panel">
+          <h2 className="preview-sidebar-title">Other Articles</h2>
+
+          {loadingOther ? (
+            <div className="preview-spinner-wrapper-small">
+              <Spinner size={30} />
+            </div>
+          ) : (
+            <ul className="preview-other-posts">
+              {otherPosts.map((post) => (
+                <li key={post.id} className="preview-other-post-item">
+                  <Link to={`/posts/${post.id}`} className="preview-other-post-link">
+                    <FaRegFileAlt className="preview-article-icon" />
+                    <span className="preview-other-post-title">
+                      {post.title.length > 50 ? post.title.slice(0, 50) + "..." : post.title}
+                    </span>
+                  </Link>
+                  <div className="preview-other-post-meta">
+                    <span className="preview-other-post-cats">
+                      {post.categories?.map((c) => c.name).join(", ")}
+                    </span>
+                    <span className="preview-other-post-date">{new Date(post.created_at).toLocaleDateString()}</span>
+                  </div>
+                </li>
+              ))}
+              {otherPosts.length === 0 && <li>No other articles available</li>}
+            </ul>
+          )}
+        </div>
+      </div>
+    </>
   );
 };
 

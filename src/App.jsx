@@ -4,6 +4,7 @@ import CreatePosts from './pages/CreatePosts'
 import AllPosts from './pages/AllPosts'
 import { ToastContainer } from 'react-toastify'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import PreviewArticles from './components/PreviewArticles'
 
 const App = () => {
   return (
@@ -20,10 +21,11 @@ const App = () => {
         pauseOnHover
       />
       <Routes>
-            <Route path="/" element={<Navigate to="/posts" replace />} />
+        <Route path="/" element={<Navigate to="/posts" replace />} />
         <Route path="/posts/create" element={<CreatePosts />} />
         <Route path="/posts/update/:id" element={<CreatePosts />} />
         <Route path="/posts" element={<AllPosts />} />
+        <Route path='/posts/:id' element={<PreviewArticles />} />
       </Routes>
     </Router>
   )

@@ -7,7 +7,7 @@ export const useFullPost = (postId, isOpen) => {
   const cache = useRef({}); 
 
   const fetchPost = useCallback(async () => {
-    if (!postId || !isOpen) return;
+    if (!postId ) return;
 
    
     if (cache.current[postId]) {

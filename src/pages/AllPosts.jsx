@@ -17,7 +17,7 @@ const AllPosts = () => {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(20);
   const [totalPosts, setTotalPosts] = useState(0);
-console.log("postsas",posts)
+  console.log("postsas", posts)
   const loadPosts = async (pageNum = 1) => {
     setLoading(true);
     try {
@@ -99,29 +99,45 @@ console.log("postsas",posts)
           <IoSearchSharp className="search-icon" />
         </div>
 
-<div className="category-select">
-  <select
-    value={selectedCategory ? selectedCategory.id.toString() : ""}
-    onChange={(e) =>
-      setSelectedCategory(
-        categories.find((c) => c.id.toString() === e.target.value) || null
-      )
-    }
-  >
-    <option value="">Select Category</option>
-    {categories.map((cat) => (
-      <option key={cat.id} value={cat.id.toString()}>
-        {cat.name}
-      </option>
-    ))}
-  </select>
-</div>
+        <div className="category-select">
+          <select
+            value={selectedCategory ? selectedCategory.id.toString() : ""}
+            onChange={(e) =>
+              setSelectedCategory(
+                categories.find((c) => c.id.toString() === e.target.value) || null
+              )
+            }
+          >
+            <option value="">Select Category</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id.toString()}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-
+              {(searchText || selectedCategory) && (
+        <button
+          className="clear-btn"
+          onClick={() => {
+            setSearchText("");
+            setSelectedCategory(null);
+            loadPosts(1); // reload all posts
+          }}
+        >
+          ✕ Clear
+        </button>
+      )}
+      
         <button className="apply-btn" onClick={handleApply}>
           Apply
         </button>
+
+
       </div>
+    
+
 
       {/* Posts */}
       {loading ? (
