@@ -18,44 +18,57 @@ const CustomCardUi = ({ posts = [], onDelete }) => {
     setSelectedPost(post);
     setIsModalOpen(true);
   };
-// const handleDownloadVideo = (videoUrl, title) => {
-//   const a = document.createElement("a");
-//   a.href = videoUrl;
-  
-//   a.download = title ? `${title.replace(/\s+/g, "_")}.mp4` : "video.mp4";
-//   a.target = "_blank"; // optional, opens in new tab if needed
-//   document.body.appendChild(a);
-//   a.click();
-//   document.body.removeChild(a);
 
-//   showSuccessToast("Video download started!");
-// };
+const handleDownloadVideo = (videoUrl, title) => {
+  try {
+    // Create a temporary <a> tag
+    const a = document.createElement("a");
+    a.href = videoUrl;
+
+    // This line *requests* a direct download (same as “Save video as…”)
+    // Works only if the video URL is from the same origin or has proper CORS headers
+    a.setAttribute("download", title ? `${title.replace(/\s+/g, "_")}.mp4` : "video.mp4");
+
+    // Optional: open directly in new tab if browser ignores "download"
+    a.target = "_blank";
+
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    showSuccessToast("Video download started!");
+  } catch (error) {
+    console.error("Error downloading video:", error);
+    showErrorToast("Failed to download video");
+  }
+};
 
 
-  const handleDownloadVideo = async (videoUrl, title) => {
-    try {
-      showSuccessToast("Video download started! Please check your downloads.");
 
-      const response = await fetch(videoUrl, { mode: "cors" });
-      if (!response.ok) {
-        showErrorToast("Failed to fetch video");
-        return;
-      }
+  // const handleDownloadVideo = async (videoUrl, title) => {
+  //   try {
+  //     showSuccessToast("Video download started! Please check your downloads.");
 
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = title ? `${title.replace(/\s+/g, "_")}.mp4` : "featured_video.mp4";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Download failed:", error);
-      showErrorToast("Failed to download video. Please check if the file is accessible.");
-    }
-  };
+  //     const response = await fetch(videoUrl, { mode: "cors" });
+  //     if (!response.ok) {
+  //       showErrorToast("Failed to fetch video");
+  //       return;
+  //     }
+
+  //     const blob = await response.blob();
+  //     const url = window.URL.createObjectURL(blob);
+  //     const a = document.createElement("a");
+  //     a.href = url;
+  //     a.download = title ? `${title.replace(/\s+/g, "_")}.mp4` : "featured_video.mp4";
+  //     document.body.appendChild(a);
+  //     a.click();
+  //     document.body.removeChild(a);
+  //     window.URL.revokeObjectURL(url);
+  //   } catch (error) {
+  //     console.error("Download failed:", error);
+  //     showErrorToast("Failed to download video. Please check if the file is accessible.");
+  //   }
+  // };
 
   if (!posts.length) {
     return <p className="no-posts">No posts found.</p>;
@@ -70,7 +83,7 @@ const CustomCardUi = ({ posts = [], onDelete }) => {
         return (
           <div className="custom-card">
       {/* Featured Media */}
-      {/* {post.featured_image ? (
+      {post.featured_image ? (
         <img src={post.featured_image} alt={post.title || "Post Image"} className="card-media" />
       ) : post.featured_video ? (
         <video
@@ -81,10 +94,10 @@ const CustomCardUi = ({ posts = [], onDelete }) => {
         />
       ) : (
         <img src={PlaceholderImage} alt="No Featured Assets" className="card-media" />
-      )} */}
+      )}
    
 
-           {
+           {/* {
               post.featured_video ? (
         <video
           src={post.featured_video}
@@ -96,7 +109,7 @@ const CustomCardUi = ({ posts = [], onDelete }) => {
         <img src={post.featured_image} alt={post.title || "Post Image"} className="card-media" />
       ) : (
         <img src={PlaceholderImage} alt="No Featured Assets" className="card-media" />
-      )}
+      )} */}
 
       {/* Card Content */}
       <div className="card-content">
