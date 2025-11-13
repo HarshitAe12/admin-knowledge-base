@@ -84,7 +84,7 @@ const handleDownloadVideo = (videoUrl, title) => {
           <div className="custom-card">
       {/* Featured Media */}
       {post.featured_image ? (
-        <img src={post.featured_image} alt={post.title || "Post Image"} className="card-media" />
+        <img src={post.featured_image} alt={post.title || "Post Image"} style={{objectFit:"fill"}} className="card-media" />
       ) : post.featured_video ? (
         <video
           src={post.featured_video}
@@ -117,7 +117,7 @@ const handleDownloadVideo = (videoUrl, title) => {
         <div className="card-meta">
           <div className="categories">
             {categories.slice(0, 1).map((cat) => (
-              <span key={cat.id} className="category">
+              <span key={cat.id} className="category" style={{fontSize:"10px"}}>
                 {cat.name}
               </span>
             ))}
@@ -136,17 +136,23 @@ const handleDownloadVideo = (videoUrl, title) => {
         </div>
 
         {/* Title */}
-        <h3 className="post-title">{post.title || "Untitled Post"}</h3>
+      <h3 className="post-title">
+  {(post.title && post.title.length > 30)
+    ? post.title.slice(0, 30) + "..."
+    : post.title || "Untitled Post"}
+</h3>
+
 
         {/* Tags */}
-        <div className="tags">
-          {tags.slice(0, 3).map((tag, i) => (
-            <span key={i} className={`tag ${i % 2 === 0 ? "tag-blue" : "tag-green"}`}>
-              {tag}
-            </span>
-          ))}
-          {tags.length > 3 && <span className="tag tag-gray">+{tags.length - 3}</span>}
-        </div>
+       <div className="tags">
+  {tags.slice(0, 2).map((tag, i) => (
+    <span key={i} style={{fontSize:"12px"}} className={`tag ${i % 2 === 0 ? "tag-blue" : "tag-green"}`}>
+      {tag}
+    </span>
+  ))}
+  {tags.length > 2 && <span className="tag tag-gray">+{tags.length - 2}</span>}
+</div>
+
       </div>
 
       {/* Actions */}
